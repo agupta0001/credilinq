@@ -1,40 +1,71 @@
 import { processStatement, uploadFile } from "@/services";
+import { FileType } from "@/types";
 import { CancelRounded, RotateRightRounded } from "@mui/icons-material";
 import { Box, CircularProgress, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export function FileViewer({ formik, file }: { formik: any; file: any }) {
+export function FileViewer({
+  formik,
+  file,
+  handleRemove,
+  index,
+}: {
+  formik: any;
+  file: any;
+  index: number;
+  handleRemove: ({
+    index,
+    recordId,
+  }: {
+    index: number;
+    recordId?: number;
+  }) => void;
+}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [savedFile, setSavedFiles] = useState<FileType | null>(null);
 
   useEffect(() => {
     async function upload() {
-      const formData = new FormData();
-      formData.set("file", file);
-      formData.set("uen", formik.values.uen);
-      const uploadedFile = await uploadFile(formData);
+      try {
+        const formData = new FormData();
+        formData.set("file", file);
+        formData.set("uen", formik.values.uen);
+        const uploadedFile = await uploadFile(formData);
 
-      if (uploadedFile) {
-        const isProcessed = await processStatement({
-          uen: formik.values.uen,
-          companyName: formik.values.companyName,
-          perfiosTransactionId:
-            localStorage.getItem("perfiosTransactionId") || "",
-          files: [uploadedFile],
-        });
+        if (uploadedFile) {
+          const isProcessed = await processStatement({
+            uen: formik.values.uen,
+            companyName: formik.values.companyName,
+            perfiosTransactionId:
+              localStorage.getItem("perfiosTransactionId") || "",
+            files: [uploadedFile],
+          });
 
-        if (isProcessed.valid) {
-          formik.setFieldValue("uploadedFiles", [
-            ...formik.values.uploadedFiles,
-            uploadedFile,
-          ]);
+          if (isProcessed.valid) {
+            setSavedFiles(uploadedFile);
+          } else {
+            setError(true);
+          }
         }
+      } catch (error) {
+        setError(true);
       }
       setLoading(false);
     }
 
     upload();
   }, []);
+
+  useEffect(() => {
+    if (!savedFile) return;
+
+    let existingFiles = formik.values.uploadedFiles;
+    existingFiles = existingFiles.filter(
+      (file: FileType) => file.resourceId !== savedFile?.resourceId
+    );
+    formik.setFieldValue("uploadedFiles", [...existingFiles, savedFile]);
+  }, [savedFile]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
@@ -66,7 +97,11 @@ export function FileViewer({ formik, file }: { formik: any; file: any }) {
         >
           {file.name}
         </Typography>
-        <CancelRounded />
+        <CancelRounded
+          onClick={() =>
+            handleRemove({ index, recordId: savedFile?.resourceId })
+          }
+        />
       </Box>
       <Typography
         variant="body1"

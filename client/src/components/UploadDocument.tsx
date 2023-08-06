@@ -1,10 +1,11 @@
-import { Box, Button, Link, Typography } from "@mui/material";
-import React from "react";
+import { Box, Button, Link } from "@mui/material";
+import React, { useCallback, useState } from "react";
 import CheckIcon from "@mui/icons-material/Check";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
-import Dropzone, { useDropzone } from "react-dropzone";
-import { CancelRounded, RotateRightRounded } from "@mui/icons-material";
+import { useDropzone } from "react-dropzone";
 import { FileViewer } from "./FileViewer";
+import { File } from "buffer";
+import { FileType } from "@/types";
 
 const uploadPoints = [
   <span key="1">
@@ -30,12 +31,49 @@ const UploadDocument = ({
   formik: any;
   activeStep: number;
 }) => {
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  const onDrop = useCallback((acceptedFiles: any) => {
+    setSelectedFiles((ps) => [...ps, ...acceptedFiles]);
+  }, []);
+
+  const { getRootProps, getInputProps } = useDropzone({
     disabled: activeStep < 2,
     accept: {
       "application/pdf": [],
     },
+    onDrop,
   });
+
+  const handleRemoveAll = () => {
+    formik.setFieldValue("uploadedFiles", []);
+    setSelectedFiles([]);
+  };
+
+  const handleRemoveOne = ({
+    index,
+    recordId,
+  }: {
+    index: number;
+    recordId?: number;
+  }) => {
+    setSelectedFiles((prevState: File[]) => {
+      const existingFiles = [...prevState];
+
+      existingFiles.splice(index, 1);
+
+      return existingFiles;
+    });
+
+    if (recordId) {
+      const existingFiles = formik.values.uploadedFiles;
+
+      formik.setFieldValue(
+        "uploadedFiles",
+        existingFiles.filter((file: FileType) => file.resourceId !== recordId)
+      );
+    }
+  };
 
   return (
     <>
@@ -119,11 +157,19 @@ const UploadDocument = ({
         </Box>
       </Box>
       <Box sx={{ ml: 1, mt: 2 }}>
-        {acceptedFiles?.map((file, idx) => (
-          <FileViewer file={file} key={idx} formik={formik} />
+        {selectedFiles?.map((file, idx) => (
+          <FileViewer
+            file={file}
+            key={idx}
+            formik={formik}
+            handleRemove={handleRemoveOne}
+            index={idx}
+          />
         ))}
-        {acceptedFiles?.length > 0 && (
-          <Button sx={{ mt: 2 }}>Remove All</Button>
+        {selectedFiles?.length > 0 && (
+          <Button sx={{ mt: 2 }} onClick={handleRemoveAll}>
+            Remove All
+          </Button>
         )}
       </Box>
     </>
