@@ -78,7 +78,7 @@ function Home() {
         uen: values.uen,
         name: values.companyName,
       },
-      files: [],
+      files: values.uploadedFiles,
       perfiosTransactionId: localStorage.getItem("perfiosTransactionId") || "",
       user: {
         email: values.email,
