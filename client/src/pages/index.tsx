@@ -186,56 +186,54 @@ function Home() {
   ];
 
   return (
-    <Box sx={{ backgroundColor: "rgb(245, 248, 250);" }}>
-      <form onSubmit={formik.handleSubmit}>
-        <Paper
-          sx={{
-            paddingTop: 6,
-            paddingBottom: 6,
-            paddingLeft: { xs: 2, md: 4 },
-            paddingRight: { xs: 2, md: 4 },
-            maxWidth: "1150px",
-            margin: "auto",
-          }}
-        >
-          <Stepper orientation="vertical" activeStep={activeStep}>
-            {steps.map(({ label, Component }) => (
-              <Step key={label} expanded={true}>
-                <StepLabel sx={{ marginBottom: 2 }}>
-                  <Box
-                    sx={{
-                      padding: "8px 16px",
-                      color: "white",
-                      borderRadius: "5px",
-                      ml: 1,
-                      background: "rgb(96, 26, 121)",
-                      fontSize: {
-                        xs: 16,
-                        md: 20,
-                      },
-                    }}
-                  >
-                    {label}
-                  </Box>
-                </StepLabel>
-                <StepContent>
-                  <Component formik={formik} activeStep={activeStep} />
-                </StepContent>
-              </Step>
-            ))}
-          </Stepper>
-          <Box sx={{ textAlign: "end", marginTop: 7 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={!formik.values.tac.checkbox}
-            >
-              Submit
-            </Button>
-          </Box>
-        </Paper>
-      </form>
-    </Box>
+    <form onSubmit={formik.handleSubmit}>
+      <Paper
+        sx={{
+          paddingTop: 6,
+          paddingBottom: 6,
+          paddingLeft: { xs: 2, md: 4 },
+          paddingRight: { xs: 2, md: 4 },
+          maxWidth: "1150px",
+          margin: "auto",
+        }}
+      >
+        <Stepper orientation="vertical" activeStep={activeStep}>
+          {steps.map(({ label, Component }) => (
+            <Step key={label} expanded={true}>
+              <StepLabel sx={{ marginBottom: 2 }}>
+                <Box
+                  sx={{
+                    padding: "8px 16px",
+                    color: "white",
+                    borderRadius: "5px",
+                    ml: 1,
+                    background: "rgb(96, 26, 121)",
+                    fontSize: {
+                      xs: 16,
+                      md: 20,
+                    },
+                  }}
+                >
+                  {label}
+                </Box>
+              </StepLabel>
+              <StepContent>
+                <Component formik={formik} activeStep={activeStep} />
+              </StepContent>
+            </Step>
+          ))}
+        </Stepper>
+        <Box sx={{ textAlign: "end", marginTop: 7 }}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={!formik.values.tac.checkbox}
+          >
+            Submit
+          </Button>
+        </Box>
+      </Paper>
+    </form>
   );
 }
 

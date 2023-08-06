@@ -28,7 +28,7 @@ export default function RootLayout({
           SME HealthCheck - Get Started
         </Typography>
       </Box>
-      {children}
+      <Box sx={{ backgroundColor: "rgb(245, 248, 250);" }}>{children}</Box>
       <Box
         sx={{
           background:
