@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: credilinq
+    restart: always
+    environment:
+      POSTGRES_DB: credilinq
+      POSTGRES_USER: credilinq
+      POSTGRES_PASSWORD: credilinq
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    driver: local
